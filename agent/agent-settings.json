@@ -1,0 +1,7 @@
+{
+  "port": 3456,
+  "token": "7fca426ffd193b7ea8c77ccd48e63348e2dcaca6e391f6a4ec3a595a19fa2edd",
+  "allowedPaths": [],
+  "maxConcurrentTransfers": 2,
+  "chunkSize": 32768
+}

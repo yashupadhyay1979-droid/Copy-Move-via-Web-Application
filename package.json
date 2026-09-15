@@ -1,0 +1,28 @@
+{
+  "name": "file-transfer-agent",
+  "version": "1.0.0",
+  "description": "Direct local file/folder transfer between folders on the user's computer",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd agent && npm install && cd ../frontend && npm install",
+    "dev:agent": "cd agent && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:agent": "cd agent && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:agent && npm run build:frontend",
+    "start:agent": "cd agent && npm start",
+    "start:frontend": "cd frontend && npm run preview",
+    "start": "concurrently \"npm run start:agent\" \"npm run start:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "file-transfer",
+    "local-filesystem",
+    "websocket",
+    "react",
+    "typescript"
+  ],
+  "license": "MIT"
+}

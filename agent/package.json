@@ -1,0 +1,29 @@
+{
+  "name": "file-transfer-agent",
+  "version": "1.0.0",
+  "description": "Local file transfer agent for direct filesystem operations",
+  "main": "dist/agent/src/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/agent/src/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "chokidar": "^3.5.3",
+    "crypto-js": "^4.2.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/ws": "^8.5.10",
+    "@types/crypto-js": "^4.2.1",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2",
+    "tsx": "^4.6.2",
+    "vitest": "^1.0.4"
+  }
+}
