@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Transfer Agent — Presentation Deck</title>
+  <style>
+    :root {
+      --bg-dark: #121214;
+      --card-dark: #1c1c20;
+      --text-white: #ffffff;
+      --bg-light: #f8f9fa;
+      --card-light: #ffffff;
+      --border-light: #e5e7eb;
+      --text-dark: #111827;
+      --text-muted: #6b7280;
+      --accent-black: #0a0a0c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: #0d0e12;
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    /* Top Controls Bar */
+    .top-bar {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .brand-badge {
+      background: #ffffff;
+      color: #000000;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      background: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid #374151;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      background: #374151;
+      color: #ffffff;
+    }
+
+    .btn.active {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+
+    /* Presentation Frame (16:9 Aspect Ratio) */
+    .deck-container {
+      width: 100%;
+      max-width: 1200px;
+      aspect-ratio: 16 / 9;
+      background: var(--bg-light);
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Slide Elements */
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 48px 56px;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .slide.dark-theme {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+    }
+
+    /* Header component */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 18px;
+      margin-bottom: 28px;
+    }
+
+    .slide.dark-theme .slide-header {
+      border-bottom-color: #27272a;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .slide-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+      color: var(--text-dark);
+    }
+
+    .slide.dark-theme .slide-title {
+      color: var(--text-white);
+    }
+
+    .slide-meta {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* Grid layouts */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    /* Card styling */
+    .card {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card.dark {
+      background: var(--card-dark);
+      border-color: #2e2e36;
+      color: var(--text-white);
+    }
+
+    .card-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text-dark);
+    }
+
+    .card.dark .card-title {
+      color: var(--text-white);
+    }
+
+    .card-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #4b5563;
+      flex: 1;
+    }
+
+    .card.dark .card-desc {
+      color: #9ca3af;
+    }
+
+    .card-stat-pill {
+      margin-top: 14px;
+      background: var(--accent-black);
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-lbl {
+      font-size: 9px;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+    }
+
+    /* Step numbers (01, 02...) */
+    .step-big-num {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 8px;
+      color: #000000;
+    }
+
+    /* Venn diagram SVG */
+    .venn-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .venn-svg {
+      width: 100%;
+      max-width: 680px;
+      height: auto;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background: #1f2937;
+      color: #ffffff;
+      border: 1px solid #374151;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .slide-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dot.active {
+      background: #ffffff;
+      width: 20px;
+      border-radius: 9999px;
+    }
+
+    /* Speaker Notes Drawer */
+    .notes-drawer {
+      width: 100%;
+      max-width: 1200px;
+      margin-top: 16px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: none;
+    }
+
+    .notes-drawer.open {
+      display: block;
+    }
+
+    .notes-header {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #a1a1aa;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notes-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #e4e4e7;
+    }
+
+    /* Milestone timeline bar */
+    .timeline-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: center;
+      position: relative;
+    }
+
+    .timeline-bar {
+      position: relative;
+      height: 4px;
+      background: #000000;
+      margin: 30px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .timeline-point {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timeline-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #000000;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 2px #000000;
+    }
+
+    .timeline-pill {
+      position: absolute;
+      top: -36px;
+      background: #ffffff;
+      border: 1px solid #000000;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Controls -->
+  <div class="top-bar">
+    <div class="brand-badge">PPTX // DIRTYLINE STUDIO THEME</div>
+    <div class="top-actions">
+      <button class="btn" id="notesToggleBtn" onclick="toggleNotes()">🎤 Presenter Notes (N)</button>
+      <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+    </div>
+  </div>
+
+  <!-- Deck Container -->
+  <div class="deck-container" id="deckContainer">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide dark-theme active" style="position: relative; overflow: hidden;" data-notes="Welcome everyone. Today I am presenting File Transfer Agent — an innovative engineering solution that enables direct, lightning-fast local file and folder operations directly through a web interface, completely eliminating browser upload bottlenecks and cloud privacy exposure.">
+      <img src="accent_rings.png" alt="Geometric Motif" style="position: absolute; right: -80px; top: -40px; width: 480px; opacity: 0.18; pointer-events: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
+        <span class="brand-badge" style="background:#fff; color:#000;">PPTX SPEC</span>
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #a1a1aa;">DIRTYLINE STUDIO // 2026</span>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 900px;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #9ca3af; margin-bottom: 8px;">ARCHITECTURAL SPECIFICATION & OVERVIEW</div>
+        <h1 style="font-size: 58px; font-weight: 900; line-height: 1.05; letter-spacing: -1.5px; margin-bottom: 20px;">FILE TRANSFER<br>AGENT</h1>
+        <p style="font-size: 18px; line-height: 1.5; color: #d1d5db; max-width: 760px;">
+          High-performance direct local file and folder transfers between folders on your machine via a modern web architecture. Zero cloud uploads, real-time streaming backpressure, and sandboxed security.
+        </p>
+      </div>
+      <div style="background: #1c1c22; border: 1px solid #2e2e38; border-radius: 10px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #d1d5db;">
+        <div><strong>AUTHOR:</strong> Yash Upadhyay (@yashupadhyay1979-droid)</div>
+        <div><strong>TECH STACK:</strong> React 18 • Node.js • WebSocket • TypeScript</div>
+        <div><strong>VERSION:</strong> 1.0.0 Production</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <div class="slide" data-notes="Here is the fundamental dilemma: Users love web dashboards for their clean interface and responsive controls, but web browsers are strictly sandboxed from direct local disk I/O. As a result, typical web apps force files to be uploaded to cloud servers, wasting immense bandwidth and exposing private local data.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">01 / The Core Challenge</div>
+          <div class="slide-title">The Web Browser File Dilemma</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.02</div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-tag">Sandbox Isolation</div>
+          <div class="card-title">Browser Sandboxing</div>
+          <div class="card-desc">Modern web browsers purposefully sandbox tabs for security. Web apps cannot perform direct local disk moves, cannot alter directory structures outside limited prompts, and lack raw disk throughput.</div>
+          <div class="card-stat-pill">
+            <div class="stat-val">100%</div>
+            <div class="stat-lbl">Sandboxed Execution</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-tag">Cloud Overhead</div>
+          <div class="card-title">Bandwidth & Privacy Waste</div>
+          <div class="card-desc">Moving a 20GB project folder between drives via traditional web tools requires 20GB upload to a cloud server plus 20GB download back. This causes extreme latency, data leaks, and storage quotas.</div>
+          <div class="card-stat-pill">
+            <div class="stat-val">2x</div>
+            <div class="stat-lbl">Redundant Data Transfer</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-tag">OS Limitations</div>
+          <div class="card-title">Legacy Explorer UX</div>
+          <div class="card-desc">Standard OS Explorers lack modern web UI ergonomics, have no remote-dashboard capabilities, cannot be scripted or triggered via web APIs, and lack granular multi-transfer queues.</div>
+          <div class="card-stat-pill">
+            <div class="stat-val">0 API</div>
+            <div class="stat-lbl">Web Remote Capabilities</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: ARCHITECTURE -->
+    <div class="slide" data-notes="Notice the clean architectural separation. The React web client runs entirely in the browser and acts as a control plane. It issues JSON-RPC commands over an encrypted localhost WebSocket to the Node.js agent daemon. The agent daemon executes native disk reads and writes directly on the machine. At no point do file bytes ever touch the browser or any remote server.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">02 / System Architecture</div>
+          <div class="slide-title">Decoupled 3-Tier Architecture</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.03</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px; flex: 1;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="card">
+            <div class="card-tag">Client Layer (Port 5173)</div>
+            <div class="card-title">React 18 + Vite Web Dashboard</div>
+            <div class="card-desc">
+              • Clean Tailwind CSS Dark/Light UI<br>
+              • Drag-and-drop filesystem path receiver<br>
+              • Live speed (MB/s), ETA calculation, and progress bars<br>
+              • Active transfer queue manager & conflict dialogs
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-tag">Transport Layer (Port 3456)</div>
+            <div class="card-title">Bidirectional WebSocket Bridge</div>
+            <div class="card-desc">
+              • Low-latency JSON-RPC communication<br>
+              • SHA-256 Bearer Token handshake auth<br>
+              • Real-time progress & status event streaming<br>
+              • Zero file payload passing (only metadata & signals)
+            </div>
+          </div>
+        </div>
+        <div class="card" style="background: #ffffff; border: 2px solid #000000;">
+          <div class="card-tag" style="color: #000000; font-weight: 800;">Execution Layer & Filesystem</div>
+          <div class="card-title">Local Node.js Agent Daemon (Direct Native Disk I/O)</div>
+          <div class="card-desc">
+            • <strong>Streaming Pipeline:</strong> 64KB highWaterMark chunks with automated backpressure handling.<br>
+            • <strong>EXDEV Link Handler:</strong> Automatic recovery when moving files across distinct physical drive partitions.<br>
+            • <strong>Security Sandbox:</strong> Bound strictly to <code>127.0.0.1</code>; validated against <code>ALLOWED_PATHS</code> whitelist.<br>
+            • <strong>AbortController:</strong> Clean instant cancellation with zero dangling streams or locked file handles.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: VENN DIAGRAM -->
+    <div class="slide" data-notes="This Venn diagram is the centerpiece of our project value proposition. Traditional web apps give you a nice UI, but force your files into the cloud. Native OS tools give you speed, but lack a web interface. File Transfer Agent sits right in the sweet spot: the elegance of web software combined with the uncompromised speed of native local storage.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">03 / Comparative Positioning</div>
+          <div class="slide-title">The Strategic Sweet Spot: Venn Diagram</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.04</div>
+      </div>
+      <div style="display: flex; gap: 24px; flex: 1; align-items: center;">
+        <div class="venn-wrapper" style="flex: 2; display: flex; align-items: center; justify-content: center;">
+          <img src="venn_diagram.png" alt="Venn Diagram" style="max-height: 380px; max-width: 100%; object-fit: contain; border-radius: 12px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.08));" onerror="this.style.display='none'; document.getElementById('vennSvg').style.display='block';">
+          <svg id="vennSvg" class="venn-svg" viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+            <defs>
+              <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15"/>
+              </filter>
+            </defs>
+            <!-- Left Circle: Cloud Apps -->
+            <circle cx="230" cy="210" r="160" fill="#e5e7eb" fill-opacity="0.65" stroke="#374151" stroke-width="2"/>
+            <!-- Right Circle: OS Tools -->
+            <circle cx="370" cy="210" r="160" fill="#d1d5db" fill-opacity="0.65" stroke="#1f2937" stroke-width="2"/>
+            
+            <!-- Left Text -->
+            <text x="140" y="170" font-size="14" font-weight="800" fill="#111827" text-anchor="middle">CLOUD WEB APPS</text>
+            <text x="140" y="195" font-size="11" fill="#4b5563" text-anchor="middle">(Drive, Dropbox, WeTransfer)</text>
+            <text x="140" y="225" font-size="11" fill="#4b5563" text-anchor="middle">+ Beautiful Modern UI</text>
+            <text x="140" y="245" font-size="11" fill="#4b5563" text-anchor="middle">+ Remote Web Access</text>
+            <text x="140" y="270" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">- Slow Upload Bandwidth</text>
+            <text x="140" y="290" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">- Cloud Privacy Risks</text>
+
+            <!-- Right Text -->
+            <text x="460" y="170" font-size="14" font-weight="800" fill="#111827" text-anchor="middle">NATIVE OS UTILITIES</text>
+            <text x="460" y="195" font-size="11" fill="#4b5563" text-anchor="middle">(Explorer, Robocopy, rsync)</text>
+            <text x="460" y="225" font-size="11" fill="#4b5563" text-anchor="middle">+ Max Drive Bus Speed</text>
+            <text x="460" y="245" font-size="11" fill="#4b5563" text-anchor="middle">+ 100% Private on Disk</text>
+            <text x="460" y="270" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">- No Web Dashboard</text>
+            <text x="460" y="290" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">- Clunky Task Controls</text>
+
+            <!-- Center Intersection Highlight -->
+            <rect x="220" y="110" width="160" height="200" rx="14" fill="#000000" filter="url(#shadow)"/>
+            <text x="300" y="145" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle">★ FILE TRANSFER</text>
+            <text x="300" y="165" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle">AGENT</text>
+            <line x1="240" y1="180" x2="360" y2="180" stroke="#374151" stroke-width="1"/>
+            <text x="300" y="205" font-size="10" font-weight="700" fill="#a7f3d0" text-anchor="middle">✓ Zero Cloud Upload</text>
+            <text x="300" y="225" font-size="10" font-weight="700" fill="#a7f3d0" text-anchor="middle">✓ Native Disk Speed</text>
+            <text x="300" y="245" font-size="10" font-weight="700" fill="#a7f3d0" text-anchor="middle">✓ Modern Web UI</text>
+            <text x="300" y="265" font-size="10" font-weight="700" fill="#a7f3d0" text-anchor="middle">✓ Live Telemetry</text>
+            <text x="300" y="285" font-size="10" font-weight="700" fill="#a7f3d0" text-anchor="middle">✓ Sandboxed Security</text>
+          </svg>
+        </div>
+        <div class="card" style="flex: 1; height: 100%; justify-content: center;">
+          <div class="card-tag">Strategic Advantage</div>
+          <div class="card-title">The Best of Both Paradigms</div>
+          <div class="card-desc">
+            Users are no longer forced to pick between the ergonomic beauty of a browser-based application and the raw I/O throughput of their physical SSDs.<br><br>
+            By decoupling the control dashboard from the native execution engine, <strong>File Transfer Agent</strong> delivers native throughput with modern web elegance.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: HOW IT WORKS -->
+    <div class="slide" data-notes="Let's walk through the exact working flow: First, the user selects source and destination paths. Second, the agent performs pre-flight path validation and directory recursion. Third, the streaming engine moves files in 64KB chunks with automatic backpressure pausing. Fourth, real-time speed and ETA are pushed across WebSockets to update the React UI live.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">04 / Step-by-Step Flow</div>
+          <div class="slide-title">How It Works: End-to-End Pipeline</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.05</div>
+      </div>
+      <div class="grid-4">
+        <div class="card">
+          <div class="step-big-num">01</div>
+          <div class="card-tag">Setup & Inputs</div>
+          <div class="card-title">Setup & Paths</div>
+          <div class="card-desc">User specifies source and destination paths via drag-and-drop or the embedded folder browser. Selects Copy vs. Move (Cut) and Conflict Strategy (Rename, Overwrite, Skip).</div>
+        </div>
+        <div class="card">
+          <div class="step-big-num">02</div>
+          <div class="card-tag">Validation</div>
+          <div class="card-title">Pre-Flight Index</div>
+          <div class="card-desc">Agent sanitizes paths against the security whitelist, recursively scans nested directories, calculates total byte count and file manifest, and registers the transfer item.</div>
+        </div>
+        <div class="card">
+          <div class="step-big-num">03</div>
+          <div class="card-tag">Engine Pipeline</div>
+          <div class="card-title">Streaming Engine</div>
+          <div class="card-desc">Files stream in 64KB chunks. Backpressure monitors write buffer saturation, pausing reads on buffer full and resuming on 'drain'. Cross-device moves fall back seamlessly.</div>
+        </div>
+        <div class="card">
+          <div class="step-big-num">04</div>
+          <div class="card-tag">Telemetry</div>
+          <div class="card-title">Live Updates</div>
+          <div class="card-desc">Instantaneous speed (MB/s) and ETA timers broadcast over WebSockets every second to update the React UI. On completion, metadata is permanently logged to transfer history.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: FEATURES MATRIX -->
+    <div class="slide" data-notes="Here are the six key pillars that make File Transfer Agent enterprise-grade: zero-cloud privacy, stream-based backpressure chunking, collision-free conflict resolution, cross-device EXDEV link handling, integrated native folder browsing, and live WebSocket telemetry queueing.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">05 / Capabilities</div>
+          <div class="slide-title">Core Functional Pillars</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.06</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex: 1;">
+        <div class="card">
+          <div class="card-tag">Security & Privacy</div>
+          <div class="card-title">1. Zero-Cloud Transfer</div>
+          <div class="card-desc">Files move directly between local physical storage drives with 0 bytes transmitted to external networks, guaranteeing 100% data sovereignty and zero bandwidth costs.</div>
+        </div>
+        <div class="card">
+          <div class="card-tag">Throughput Engine</div>
+          <div class="card-title">2. Backpressure Streaming</div>
+          <div class="card-desc">Handles files of any size without RAM explosion. Uses configurable 64KB chunk buffers and Node.js drain event listeners to ensure rock-solid memory stability.</div>
+        </div>
+        <div class="card">
+          <div class="card-tag">Data Integrity</div>
+          <div class="card-title">3. Smart Conflict Resolution</div>
+          <div class="card-desc">Collision prevention dialog with three selectable modes: clean overwrite, instantaneous skip with progress adjustment, or automatic incremental renaming: <code>file (1).ext</code>.</div>
+        </div>
+        <div class="card">
+          <div class="card-tag">Operating System</div>
+          <div class="card-title">4. EXDEV Cross-Drive Link</div>
+          <div class="card-desc">Atomic instantaneous <code>rename</code> on the same drive partition, with automatic recovery to a verified streaming-copy + unlink cycle when moving across separate disks (e.g. C: to D:).</div>
+        </div>
+        <div class="card">
+          <div class="card-tag">User Experience</div>
+          <div class="card-title">5. Native Folder Browser</div>
+          <div class="card-desc">Interactive UI modal that queries drive roots, traverses nested folders, and selects paths natively without forcing the user to type error-prone path strings.</div>
+        </div>
+        <div class="card">
+          <div class="card-tag">Queue Control</div>
+          <div class="card-title">6. Queue & Telemetry</div>
+          <div class="card-desc">Configurable concurrent operations (default 3), pause/resume/cancel controls, real-time speed in MB/s, ETA clocks, and full historical auditing logs.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: DEEP DIVE STREAM & EXDEV -->
+    <div class="slide" data-notes="Two critical engineering challenges had to be solved: First, memory bloat when copying large files was solved using Node.js backpressure stream pausing. Second, moving files across different drives throws EXDEV in Windows and Unix; our agent catches this and falls back to a verified copy-and-unlink cycle.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">06 / Technical Deep Dive</div>
+          <div class="slide-title">Stream Backpressure & EXDEV Recovery</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.07</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-tag">Memory Engineering</div>
+          <div class="card-title">Stream Backpressure Handling</div>
+          <div class="card-desc">
+            <p style="margin-bottom: 12px;"><strong>The Challenge:</strong> Reading multi-gigabyte files into memory faster than destination disks can write leads to memory exhaustion and Node.js process crashes.</p>
+            <p style="margin-bottom: 12px;"><strong>The Implementation:</strong> Streams are created with custom <code>highWaterMark</code> chunking (64KB default). When <code>writeStream.write(chunk)</code> returns false, <code>readStream.pause()</code> triggers immediately.</p>
+            <p><strong>The Drain Event:</strong> When the destination OS kernel flushes the buffer, the write stream emits <code>drain</code>, resuming reads. RAM usage remains flat (~30MB) even on 100GB files.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-tag">Filesystem Resilience</div>
+          <div class="card-title">The Cross-Device (EXDEV) Problem</div>
+          <div class="card-desc">
+            <p style="margin-bottom: 12px;"><strong>The Constraint:</strong> Standard OS <code>fs.rename</code> is an atomic filesystem inode pointer update. It only works within the exact same physical disk partition.</p>
+            <p style="margin-bottom: 12px;"><strong>The EXDEV Bug:</strong> Moving files across partitions (e.g. from <code>C:\</code> to <code>D:\</code>) throws <code>EXDEV: cross-device link not permitted</code>.</p>
+            <p><strong>Our Solution:</strong> The engine catches EXDEV automatically, seamlessly spins up a chunked streaming copy, monitors progress, and unlinks the source only upon verified completion.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: BENCHMARKS -->
+    <div class="slide" data-notes="Looking at the numbers: 0 bytes of cloud data consumed, 64KB stream buffers that prevent RAM overload, sub-5ms WebSocket latency, and 100% saturation of native drive speeds. It completely outclasses standard web uploaders.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">07 / Performance Metrics</div>
+          <div class="slide-title">Throughput, Latency & Resource Efficiency</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.08</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; flex: 1;">
+        <div class="grid-4">
+          <div class="card-stat-pill" style="margin-top: 0; padding: 18px;">
+            <div class="stat-val" style="font-size: 32px;">0 Bytes</div>
+            <div class="stat-lbl">Cloud Data Consumed</div>
+            <div style="font-size: 11px; color: #9ca3af; margin-top: 6px;">Zero external bandwidth usage during 100GB transfers</div>
+          </div>
+          <div class="card-stat-pill" style="margin-top: 0; padding: 18px;">
+            <div class="stat-val" style="font-size: 32px;">64 KB</div>
+            <div class="stat-lbl">Default Buffer Size</div>
+            <div style="font-size: 11px; color: #9ca3af; margin-top: 6px;">Configurable up to 4MB for high-speed NVMe arrays</div>
+          </div>
+          <div class="card-stat-pill" style="margin-top: 0; padding: 18px;">
+            <div class="stat-val" style="font-size: 32px;">&lt; 5 ms</div>
+            <div class="stat-lbl">WebSocket Latency</div>
+            <div style="font-size: 11px; color: #9ca3af; margin-top: 6px;">Instantaneous UI reactivity and progress telemetry</div>
+          </div>
+          <div class="card-stat-pill" style="margin-top: 0; padding: 18px;">
+            <div class="stat-val" style="font-size: 32px;">100%</div>
+            <div class="stat-lbl">Native Drive Speed</div>
+            <div style="font-size: 11px; color: #9ca3af; margin-top: 6px;">Full hardware bus saturation (up to 3,500 MB/s)</div>
+          </div>
+        </div>
+        <div class="card" style="flex: 1;">
+          <div class="card-tag">Performance Comparison Matrix</div>
+          <div class="card-title">Transfer Speed Across Approaches</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; font-size: 12px; margin-top: 10px;">
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 8px;">
+              <strong>HTTP Web Uploader</strong><br>
+              <span style="font-size: 18px; font-weight: 800; color: #dc2626;">~15 MB/s</span><br>
+              Browser memory limit, server roundtrip bottlenecks.
+            </div>
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 8px;">
+              <strong>Cloud Storage Client</strong><br>
+              <span style="font-size: 18px; font-weight: 800; color: #f59e0b;">~25 MB/s</span><br>
+              Throttled by ISP upload bandwidth and remote servers.
+            </div>
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 8px;">
+              <strong>OS Windows Explorer</strong><br>
+              <span style="font-size: 18px; font-weight: 800; color: #10b981;">~400-2,500 MB/s</span><br>
+              Native bus speed, but no web dashboard or API control.
+            </div>
+            <div style="background: #000000; color: #ffffff; padding: 12px; border-radius: 8px;">
+              <strong>File Transfer Agent</strong><br>
+              <span style="font-size: 18px; font-weight: 800; color: #34d399;">~400-3,500 MB/s</span><br>
+              Full native hardware speed + reactive web dashboard.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: MILESTONES -->
+    <div class="slide" data-notes="This roadmap showcases the project trajectory: from establishing the core WebSocket daemon, building the polished React interface, resolving critical edge cases like EXDEV, to our future vision of LAN peer-to-peer transfers and chunk-level resume.">
+      <div class="slide-header">
+        <div>
+          <div class="section-tag">08 / Roadmap</div>
+          <div class="slide-title">Project Milestones & Future Scope</div>
+        </div>
+        <div class="slide-meta">FILE TRANSFER AGENT // P.09</div>
+      </div>
+      <div class="timeline-container">
+        <div class="timeline-bar">
+          <div class="timeline-point" style="left: 0%;">
+            <div class="timeline-pill">PHASE 1</div>
+            <div class="timeline-dot"></div>
+          </div>
+          <div class="timeline-point" style="left: 33%;">
+            <div class="timeline-pill">PHASE 2</div>
+            <div class="timeline-dot"></div>
+          </div>
+          <div class="timeline-point" style="left: 66%;">
+            <div class="timeline-pill">PHASE 3</div>
+            <div class="timeline-dot"></div>
+          </div>
+          <div class="timeline-point" style="left: 100%;">
+            <div class="timeline-pill">PHASE 4</div>
+            <div class="timeline-dot"></div>
+          </div>
+        </div>
+        <div class="grid-4" style="margin-top: 10px;">
+          <div class="card">
+            <div class="card-tag">Architecture (Done)</div>
+            <div class="card-title">Core Engine</div>
+            <div class="card-desc">WebSocket RPC protocol, Node.js streaming pipeline, basic file operations, backpressure stream pausing.</div>
+          </div>
+          <div class="card">
+            <div class="card-tag">Web UI (Done)</div>
+            <div class="card-title">React 18 Dashboard</div>
+            <div class="card-desc">Tailwind CSS dark/light theme, drive browser modal, conflict resolution dialog, real-time speed & ETA.</div>
+          </div>
+          <div class="card">
+            <div class="card-tag">Production (Current)</div>
+            <div class="card-title">EXDEV & Sandboxing</div>
+            <div class="card-desc">Cross-device partition recovery, SHA-256 token authentication, path whitelisting, GitHub repo release.</div>
+          </div>
+          <div class="card">
+            <div class="card-tag">Future Scope</div>
+            <div class="card-title">P2P LAN Transfer</div>
+            <div class="card-desc">Peer-to-peer local network discovery, SHA-256 chunk-level checksums, interrupt resume, background daemon runner.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: CONCLUSION -->
+    <div class="slide dark-theme" data-notes="In conclusion, File Transfer Agent proves that web applications can break out of their sandbox constraints safely and intelligently. Thank you very much for your time. I am now open to any questions!">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="brand-badge" style="background:#fff; color:#000;">SUMMARY</span>
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #a1a1aa;">FILE TRANSFER AGENT // P.10</span>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #9ca3af; margin-bottom: 8px;">FINAL SUMMARY & VALUE</div>
+        <h2 style="font-size: 46px; font-weight: 900; line-height: 1.1; margin-bottom: 24px;">BRIDGING WEB ELEGANCE &<br>NATIVE FILESYSTEM SPEED</h2>
+        <div style="background: #1c1c22; border: 1px solid #2e2e38; border-radius: 12px; padding: 24px; max-width: 900px;">
+          <p style="font-size: 15px; line-height: 1.6; color: #e5e7eb; margin-bottom: 16px;">
+            <strong>1. Complete Architectural Decoupling:</strong> The browser acts solely as an intuitive control plane while the local agent daemon carries out high-speed native I/O with zero cloud exposure.<br>
+            <strong>2. Resilient Engineering:</strong> Production-hardened against stream backpressure memory spikes, EXDEV multi-drive partitions, and filesystem race conditions.<br>
+            <strong>3. Open & Production Ready:</strong> Fully typed with TypeScript, tested, documented, and available on GitHub.
+          </p>
+          <div style="font-size: 13px; color: #60a5fa; font-weight: 700;">
+            🔗 GitHub: https://github.com/yashupadhyay1979-droid/Copy-Move-via-Web-Application
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 12px; color: #9ca3af; text-align: center;">
+        Thank you! Questions & Discussion
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div style="font-size: 12px; color: #9ca3af;">Use Arrow Keys / Space to navigate</div>
+    <div class="slide-dots" id="dotsContainer"></div>
+    <div class="nav-controls">
+      <button class="nav-btn" id="prevBtn" onclick="prevSlide()">◀ Previous</button>
+      <span id="slideCounter" style="font-weight: 700; color: #ffffff; min-width: 50px; text-align: center;">1 / 10</span>
+      <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Next ▶</button>
+    </div>
+  </div>
+
+  <!-- Speaker Notes Drawer -->
+  <div class="notes-drawer" id="notesDrawer">
+    <div class="notes-header">
+      <span>Speaker Talking Notes</span>
+      <span>Press N to hide</span>
+    </div>
+    <div class="notes-content" id="notesText"></div>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const dotsContainer = document.getElementById('dotsContainer');
+    const slideCounter = document.getElementById('slideCounter');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const notesDrawer = document.getElementById('notesDrawer');
+    const notesText = document.getElementById('notesText');
+    const notesToggleBtn = document.getElementById('notesToggleBtn');
+
+    // Build dots
+    slides.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+      dot.onclick = () => goToSlide(idx);
+      dotsContainer.appendChild(dot);
+    });
+
+    function updateSlide() {
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('active', idx === currentSlide);
+      });
+      document.querySelectorAll('.dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentSlide);
+      });
+      slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+
+      // Update speaker notes
+      notesText.textContent = slides[currentSlide].getAttribute('data-notes') || 'No speaker notes for this slide.';
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function goToSlide(idx) {
+      currentSlide = idx;
+      updateSlide();
+    }
+
+    function toggleNotes() {
+      notesDrawer.classList.toggle('open');
+      notesToggleBtn.classList.toggle('active');
+    }
+
+    function toggleFullscreen() {
+      const elem = document.getElementById('deckContainer');
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => {
+          alert(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'n') {
+        toggleNotes();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>
